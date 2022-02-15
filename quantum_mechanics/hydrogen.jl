@@ -80,7 +80,6 @@ function Hydrogen_ψ(n, l, m, r, θ, ϕ)
     ψ = sqrt(Complex(((2/(n*a))^3)*(factorial(big(n-l-1))/(2*n*factorial(big(n+l))))))*exp(-ρ/2)*(ρ^l)*L*Y
 
     return ψ
-
 end
 
 Hydrogen_P(n, l, m, r, θ, ϕ) = abs2(Hydrogen_ψ(n,l,m,r,θ,ϕ))
