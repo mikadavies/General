@@ -1,4 +1,6 @@
-# Julia code to visualise Hydrogen orbitals
+# Quantum Mechanics
+
+## hydrogen.jl - Julia code to visualise Hydrogen orbitals
 
 ### Visualisation functions
 - ```plotP(n, l, m, rmax, path, steps, c_lim, legend)``` plots a heatmap for the hydrogen orbital with quantum numbers n,l,m up to a distance from the centre rmax (in terms of aₒ). Plot output to given path. The number of steps at which the probability is calculated between the cntre and the radius is defined by the steps argument (default 100). Optionally, the colormap upper limit can be specified with c_lim and colorbar can be toggled on or off through the legend option (default off).
