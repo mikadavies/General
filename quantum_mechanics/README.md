@@ -20,3 +20,6 @@
 
 ### Utilities / Helper functions
 - ```nlm(max)``` creates an array of tuples for all possible (n,l,m) combinations for n up to max.
+
+### Example visualisation
+![image](https://user-images.githubusercontent.com/77616015/154161495-a399cdd9-1da6-428e-bfc7-bbfadfc9ef8b.png|width=500px)
