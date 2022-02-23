@@ -3,6 +3,7 @@
 # Includes
 using ForwardDiff
 using Plots
+using Distributions
 
 # Constants
 aₒ = 5.2917721090380*10^(-11) # m
@@ -58,6 +59,28 @@ function cartesian2polar(x, y)
     return r, θ
 end
 
+function integrate(f, a, b, steps) # based on the Monte Carlo method
+    steps = Int(steps)
+    xs = []
+    ls = []
+    i = 1
+    while i <= length(a)
+        append!(xs, [rand(Uniform(a[i],b[i]),steps)])
+        l = b[i]-a[i]
+        append!(ls, [l])
+        i += 1
+    end
+    Y = 0
+    V = prod(ls)
+    for j in 1:steps
+        x = [xs[n][j] for n in 1:length(xs)]
+        Y += f(x)
+    end
+    Y = Y*(1/steps)
+    I = Y*V
+    return I
+end
+
 # Quantum mechanical functions
 
 function Harmonic(l, m, θ, ϕ)
@@ -83,6 +106,16 @@ function Hydrogen_ψ(n, l, m, r, θ, ϕ)
 end
 
 Hydrogen_P(n, l, m, r, θ, ϕ) = abs2(Hydrogen_ψ(n,l,m,r,θ,ϕ))
+
+function Probability(n, l, m, rmin, θmin, ϕmin, rmax, θmax, ϕmax, steps) #Currently doesn't work very well with large values (>3000aₒ)
+    f = x -> Hydrogen_P(n,l,m,x[1],x[2],x[3])
+    a = [rmin, θmin, ϕmin]
+    b = [rmax, θmax, ϕmax]
+    I = integrate(f,a,b,steps)
+    V = (4/3*π*rmax^3)-(4/3*π*rmin^3)
+    P = I*V
+    return P
+end    
 
 # Utilities
 function nlm(max)
@@ -120,6 +153,27 @@ function plotP(n, l, m, rmax, path, steps=100, c_lim=NaN, legend=false) #rmax in
     println("$n,$l,$m")
 end
 
+function probabilityHeatmap(n, l, m, rmax, path, steps=100, c_lim=NaN, legend=false) #rmax in terms of aₒ
+    function f(x, y)
+        r, θ = cartesian2polar(x*aₒ, y*aₒ)
+        dr = 0.5*aₒ*rmax/steps
+        dθ = π/steps
+        P = Probability(n, l, m, r-dr, θ-dθ, 0, r+dr, θ+dθ, 2π, 1e5)
+        isnan(P) ? P=0 : P=P
+        return P
+    end
+    rs = range(-rmax, rmax, length=steps)
+    if isnan(c_lim)
+        legend == false ? heatmap(rs, rs, f, c=:default, axis=nothing, size=(1000,1000), legend=:none) : heatmap(rs, rs, f, c=:default, axis=nothing, size=(1000,1000))
+    else
+        legend == false ? heatmap(rs, rs, f, c=:default, axis=nothing, clim=(0,c_lim), size=(1000,1000), legend=:none) : heatmap(rs, rs, f, c=:default, axis=nothing, clim=(0,c_lim), size=(1000,1000))
+    end
+    annotate!(0.9rmax, -0.9rmax, text("($n,$l,$m)", :white, "TimesNewRoman", 15))
+    fname = string(path, "\\$n$l$m")
+    png(fname)
+    println("$n,$l,$m")
+end    
+    
 function showAll(max, path, steps=100)
     indices = nlm(max)
     for i in indices
