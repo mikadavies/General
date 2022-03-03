@@ -59,24 +59,18 @@ function cartesian2polar(x, y)
     return r, θ
 end
 
-function integrate(f, a, b, steps) # based on the Monte Carlo method
-    steps = Int(steps)
-    xs = []
-    ls = []
-    i = 1
-    while i <= length(a)
-        append!(xs, [rand(Uniform(a[i],b[i]),steps)])
-        l = b[i]-a[i]
-        append!(ls, [l])
-        i += 1
+function integrate(f, a, b, steps)
+    N = Int(steps)
+    Ys = zeros(N)
+    Threads.@threads for i in 1:N
+        x = []
+        for j in 1:length(a)
+            append!(x, rand(Uniform(a[j],b[j])))
+        end
+        Ys[i] = f(x)
     end
-    Y = 0
-    V = prod(ls)
-    for j in 1:steps
-        x = [xs[n][j] for n in 1:length(xs)]
-        Y += f(x)
-    end
-    Y = Y*(1/steps)
+    V = prod([b[i]-a[i] for i in 1:length(a)])
+    Y = sum(Ys)/N
     I = Y*V
     return I
 end
@@ -191,7 +185,7 @@ function showAll(max, path, steps=100)
         else
             c_lim = sum(i)/3*((0.2^(i[1]+i[2]))*0.2e31)
         end
-        fullP(i[1],i[2],i[3],rmax,steps,c_lim,false,path)
+        plotP(i[1],i[2],i[3],rmax,path,steps,c_lim,false,path)
     end
     println("FINISHED!")
 end
