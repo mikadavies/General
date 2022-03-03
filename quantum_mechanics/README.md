@@ -17,6 +17,7 @@
 - ```Binomial(n, k)``` binomial coefficient of (n,k), accepting n=1/2.
 - ```Legendre(l, m, x)``` associated Legendre polynomial of order m.
 - ```polar2cartesian(r,θ)``` and ```cartesian2polar(x,y)``` 2D transformation from polar to cartesian coordinates and vice versa.
+- ```integrate(f, a, b, steps)``` integrate function f from a to b, based on Monte Carlo integration. Supports multiple integration through the use of arrays as function input, a and b.
 
 ### Utilities / Helper functions
 - ```nlm(max)``` creates an array of tuples for all possible (n,l,m) combinations for n up to max.
